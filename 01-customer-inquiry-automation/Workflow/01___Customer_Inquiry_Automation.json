@@ -1,0 +1,125 @@
+{
+  "name": "01 - Customer Inquiry Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Customer Inquiry Form",
+        "formDescription": "Submit your inquiry below",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "placeholder": "Enter your full name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Address",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Name"
+            },
+            {
+              "fieldLabel": "Message",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -660,
+        -40
+      ],
+      "id": "2146c8f4-17bd-4029-a320-ec3a97838730",
+      "name": "On form submission",
+      "webhookId": "2eb0a567-d746-4686-89fe-c0e6450f7b37"
+    },
+    {
+      "parameters": {
+        "sendTo": "admin@example.com",
+        "subject": "New Customer Inquiry",
+        "message": "=\n{{ `NEW CUSTOMER INQUIRY\n\nCustomer Information:\n\nName: ${$json[\"Full Name\"]}\nEmail: ${$json[\"Email Address\"]}\nCompany: ${$json[\"Company Name\"]}\n\nMessage:\n${$json[\"Message\"]}\n\nPlease follow up with this customer.` }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -440,
+        -40
+      ],
+      "id": "50b8ac75-786d-48b6-b815-fd3afee6cbca",
+      "name": "Send Admin Notification",
+      "webhookId": "9b076ba0-46d2-4ed9-95a3-6a074d84e768",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7wnxfwA9RtxTvSRr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json[\"Email Address\"] }}",
+        "subject": "Inquiry Received — Thank You",
+        "emailType": "text",
+        "message": "=\n{{ `Hello ${$('On form submission').item.json[\"Full Name\"]},\n\nThank you for contacting us!\n\nWe have successfully received your inquiry.\n\nCustomer Details:\nName: ${$('On form submission').item.json[\"Full Name\"]}\nEmail: ${$('On form submission').item.json[\"Email Address\"]}\nCompany: ${$('On form submission').item.json[\"Company Name\"]}\n\nYour Message:\n${$('On form submission').item.json[\"Message\"]}\n\nOur team will review your inquiry and contact you soon.\n\nBest regards,\nCustomer Support Team` }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -220,
+        -40
+      ],
+      "id": "7ac75eb4-b186-41eb-b1b0-188a2320bf5d",
+      "name": "Send Customer Confirmation",
+      "webhookId": "e9514554-0ad9-43c8-869f-dde746b9cec6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7wnxfwA9RtxTvSRr",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Send Admin Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Admin Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Customer Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e2071b17-7e38-4f07-ac2f-daf9975f4f34",
+  "meta": {
+    "instanceId": "7a85941cb4cc1dc73889c4093e8e13aa20d3106c53fea34579f37a5f291ddfa0"
+  },
+  "id": "IamX187tKA5Ta9Rf",
+  "tags": []
+}
